@@ -1,0 +1,3 @@
+- Add SNS notification.
+- Replace instances_list to get a tag DR=true from instances.
+- Make regions configurable.
