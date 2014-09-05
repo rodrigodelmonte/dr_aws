@@ -48,7 +48,7 @@ def check_ami(ami):
 def delete_old_ami(list_ami):
 	'''This function deregister an old ami.'''
 
-	date_N_days_ago = datetime.now() - timedelta(days=2)
+    date_N_days_ago = datetime.now() - datetime.timedelta(days=2)
     date_N_days_ago = date_N_days_ago.strftime("%Y-%m-%d")
     for ami in list_ami:
         if ami[10:] <= date_N_days_ago:
