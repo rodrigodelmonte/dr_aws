@@ -3,7 +3,7 @@ from boto import ec2
 import datetime
 
 # Instances name that should be copied to Oregon AWS region.
-disaster_recovery_instances = ['PRD_WS2','PRD_APP1_azB']
+disaster_recovery_instances = ['Instance00','Instance01']
 
 date = strftime("-%Y-%m-%d")
 
