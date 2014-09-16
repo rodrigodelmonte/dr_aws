@@ -2,6 +2,9 @@ from time import strftime, sleep
 from boto import ec2
 import datetime
 
+# Instances name that should be copied to Oregon AWS region.
+disaster_recovery_instances = ['PRD_WS2','PRD_APP1_azB']
+
 date = strftime("-%Y-%m-%d")
 
 AWS_ACCESS_KEY_ID = ''
@@ -46,21 +49,22 @@ def check_ami(ami):
 
 
 def delete_old_ami(list_ami):
-	'''This function deregister an old ami.'''
+    '''This function deregister an old ami.'''
 
-    date_N_days_ago = datetime.now() - datetime.timedelta(days=2)
+    date_N_days_ago = datetime.datetime.now() - datetime.timedelta(days=2)
     date_N_days_ago = date_N_days_ago.strftime("%Y-%m-%d")
     for ami in list_ami:
-        if ami[10:] <= date_N_days_ago:
+        if ami.name[-10:] <= date_N_days_ago:
             ami.deregister()
 
 
-# Creates instances list.
+# Starts generate ami.
 reservations = conn_east.get_all_instances()
+instances = [i for r in reservations for i in r.instances]
 instance_list = []
-for res in reservations:
-    for inst in res.instances:
-        instance_list.append({'instance_id': inst.id, 'Name': inst.tags['Name']})
+for inst in instances:
+	if inst.tags['Name'] in disaster_recovery_instances:
+		instance_list.append({'instance_id': inst.id, 'Name': inst.tags['Name']})
 
 # Creates instances ami.
 builded_ami = create_ami(instance_list)
@@ -76,7 +80,7 @@ for ami in builded_ami:
                              description=ami_name)
 
 # Clean old AMI, first test carefully.
-sleep(900)
+sleep(300)
 
 list_ami = conn_west.get_all_images(owners='self')
 delete_old_ami(list_ami)
