@@ -48,14 +48,15 @@ def check_ami(ami):
     return state.state
 
 
-def delete_old_ami(list_ami):
+def delete_old_ami(list_ami, conn_region):
     '''This function deregister an old ami.'''
 
+    conn = conn_region
     date_N_days_ago = datetime.datetime.now() - datetime.timedelta(days=2)
     date_N_days_ago = date_N_days_ago.strftime("%Y-%m-%d")
     for ami in list_ami:
         if ami.name[-10:] <= date_N_days_ago:
-            ami.deregister()
+            conn.deregister_image(ami.id, delete_snapshot=True)
 
 
 # Starts generate ami.
@@ -83,6 +84,6 @@ for ami in builded_ami:
 sleep(300)
 
 list_ami = conn_west.get_all_images(owners='self')
-delete_old_ami(list_ami)
+delete_old_ami(list_ami, conn_west)
 list_ami = conn_east.get_all_images(owners='self')
-delete_old_ami(list_ami)
+delete_old_ami(list_ami, conn_east)
